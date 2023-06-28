@@ -1,0 +1,51 @@
+#!/bin/sh
+
+help() {
+    echo "Usage: $0 [[p|m] [db] | [user password] | [user password db]]"
+    [ "$1" == "" ] || echo $1
+    exit 0
+}
+
+for arg in "$@"; do
+    [ "$arg" = "-h" ] || [ "$arg" = "--help" ] || [ "$#" -eq 0 ] && help
+done
+
+conp() {
+    echo "Connection au serveur PostgreSQL"
+    if [ "$#" -eq 1 ]; then
+        PGDB=$1
+    elif [ "$#" -ge 2 ]; then
+        PGUSER=$1
+        PGPASSWORD=$2
+        [ "$#" -eq 3 ] && PGDB=$3
+    fi
+    psql -U "${PGUSER}" -d "${PGDB}"
+    exit $?
+}
+
+conm() {
+    echo "Connection au serveur MariaDB"
+    if [ "$#" -ge 2 ]; then
+        MYUSER=$1
+        MYPASSWORD=$2
+        [ "$#" -eq 3 ] && MYDB=$3
+    fi
+    mysql -u "${MYUSER}" -p"${MYPASSWORD}" -D "${MYDB}"
+    exit $?
+}
+
+if [ "$1" = "p" ]; then
+    shift
+    conp "$@"
+elif [ "$1" = "m" ]; then
+    shift
+    conm "$@"
+elif command -v psql >/dev/null 2>&1 && command -v mysql >/dev/null 2>&1; then
+    help "Les deux clients sont installés donc p ou m en 1er argument est nécessaire"
+elif command -v psql >/dev/null 2>&1; then
+    conp "$@"
+elif command -v mysql >/dev/null 2>&1; then
+    conm "$@"
+else
+    help
+fi
