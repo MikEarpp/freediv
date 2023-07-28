@@ -1,0 +1,36 @@
+#!/bin/bash
+
+help() {
+    echo "Usage: $0 [db] | [user password] | [user password db]"
+    [ "$1" != "" ] && echo "$1"
+    exit 1
+}
+
+case "$#" in
+    0)
+        PGUSER=$_POSTGRES_ROOT_USER
+        PGPASSWORD=$_POSTGRES_ROOT_PASSWORD
+        ;;
+    1)
+        PGUSER=$_POSTGRES_ROOT_USER
+        PGPASSWORD=$_POSTGRES_ROOT_PASSWORD
+        PGDB=$1
+        ;;
+    2)
+        PGUSER=$1
+        PGPASSWORD=$2
+        ;;
+    3)
+        PGUSER=$1
+        PGPASSWORD=$2
+        PGDB=$3
+        ;;
+    *)
+        help
+        ;;
+esac
+
+[ -z "$PGUSER" ] || [ -z "$PGPASSWORD" ] || [ -z "$PGDB" ] && help "Erreur: argument(s) invalide(s)."
+
+psql -U "$PGUSER" -d "$PGDB"
+exit $?
