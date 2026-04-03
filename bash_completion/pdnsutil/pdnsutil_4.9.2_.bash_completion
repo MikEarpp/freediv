@@ -1,4 +1,4 @@
-have pdnsutil && {
+command -v pdnsutil >/dev/null 2>&1 && {
   pdnsutil_helper() {
     local cur prev cmd
     local options="activate-tsig-key activate-zone-key add-autoprimary add-meta add-record add-zone-key b2b-migrate backend-cmd bench-db change-secondary-zone-primary
