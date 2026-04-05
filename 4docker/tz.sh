@@ -2,7 +2,6 @@
 set -e
 [ -f /usr/share/zoneinfo/Europe/Paris ] || {
     if [ "$1" = "apt" ]; then
-        apt-get update \
         && apt-get install -y --no-install-recommends tzdata \
         && rm -rf /var/lib/apt/lists/*
     elif [ "$1" = "apk" ]; then
