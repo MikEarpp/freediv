@@ -1,5 +1,14 @@
+col_c() { [ -n "${!1}" ] && printf "%b" "${!1}" || printf "%b" "$White"; }
+col_r() { printf "%b" "$Reset"; }
+
+col_t() { while [ $# -gt 1 ]; do printf "%b%s%b\n" "${!1}" "$2" "$Reset"; shift 2; done; }
+
+col_e() { printf "%b%s%b\n" "$Red" "$1" "$Reset"; }
+col_w() { printf "%b%s%b\n" "$Yellow" "$1" "$Reset"; }
+col_i() { printf "%b%s%b\n" "$Cyan" "$1" "$Reset"; }
+col_d() { printf "%b%s%b\n" "$IPurple" "$1" "$Reset"; }
+
 # https://stackoverflow.com/a/28938235
-#
 # https://misc.flogisoft.com/bash/tip_colors_and_formatting
 
 # Reset
