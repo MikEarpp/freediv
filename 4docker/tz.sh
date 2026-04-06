@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 set -e
-[ -f /usr/share/zoneinfo/Europe/Paris ] || {
+
+if [ ! -f /usr/share/zoneinfo/Europe/Paris ]; then
     if [ "$1" = "apt" ]; then
         apt-get install -y --no-install-recommends tzdata \
         && rm -rf /var/lib/apt/lists/*
@@ -9,6 +10,7 @@ set -e
     else
         exit 1
     fi
-}
+fi
+
 echo "Europe/Paris" > /etc/timezone
 ln -fs /usr/share/zoneinfo/Europe/Paris /etc/localtime
