@@ -2,7 +2,7 @@
 set -e
 [ -f /usr/share/zoneinfo/Europe/Paris ] || {
     if [ "$1" = "apt" ]; then
-        && apt-get install -y --no-install-recommends tzdata \
+        apt-get install -y --no-install-recommends tzdata \
         && rm -rf /var/lib/apt/lists/*
     elif [ "$1" = "apk" ]; then
         apk add --no-cache tzdata
