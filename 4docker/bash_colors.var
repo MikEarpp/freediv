@@ -1,7 +1,7 @@
 col_c() { [ -n "${!1}" ] && printf "%b" "${!1}" || printf "%b" "$White"; }
 col_r() { printf "%b" "$Reset"; }
 
-col_t() { while [ $# -gt 1 ]; do printf "%b%s%b\n" "${!1}" "$2" "$Reset"; shift 2; done; }
+col_t() { while [ $# -gt 1 ]; do printf "%b%s" "$1" "$2"; shift 2; done; printf "%b\n" "$Reset"; }
 
 col_e() { printf "%b%s%b\n" "$Red" "$1" "$Reset"; }
 col_w() { printf "%b%s%b\n" "$Yellow" "$1" "$Reset"; }
