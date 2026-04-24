@@ -80,7 +80,7 @@ bg_val="${colors[$b_color]}";   fg_val="${colors[$f_color]}"
 bg4_val="${colors[$b4_color]}"; fg4_val="${colors[$f4_color]}"
 
 mapfile -t hostn < <(grep -m 1 -B $hostn_max -E "^$word" "$0" | head -n $hostn_max)
-[ "$with_logo" == "1" ] && { mapfile -t logo < <(grep -B 3 -E "^oracle *" "$0" | head -n 3); full_space=0; }
+[ "$with_logo" == "1" ] && { mapfile -t logo < <(grep -B 3 -E "^oracle *" "$0" | head -n 3); }
 min=${#logo[0]}; max=${#hostn[0]}; nb_char="${#logo[0]}"
 
 # ajout de lOS
