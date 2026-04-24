@@ -7,7 +7,8 @@ colors=(["sage"]="135;151;122" ["purple"]="189;147;249"    ["cyan"]="139;233;253
         ["emerald"]="26;94;99" ["oracle-red"]="199;70;52"  ["reset"]="${E}[0m")
 
 #----------------------------------------------------------------------------------------------------------------
-get_rand() { local keys=("${!colors[@]}"); echo "${keys[$RANDOM % ${#keys[@]}]}"; }
+color_keys=("${!colors[@]}")
+get_rand() { echo "${color_keys[$RANDOM % ${#color_keys[@]}]}"; }
 is_valid() { [[ -n "$1" && -n "${colors[$1]}" ]]; }
 show_help() {
     local c_title="${E}[1;38;2;${colors["cyan"]}m"
@@ -43,8 +44,8 @@ EOF
 }
 
 get_hostname() {
-    local hn=$(hostname)
-    grep -E "^${hn}$" "$0" > /dev/null 2>&1 && echo "$hn" || echo "null"
+    local hn=$(hostname --short)
+    grep -Fx "$hn" "$0" > /dev/null 2>&1 && echo "$hn" || echo "null"
 }
 #----------------------------------------------------------------------------------------------------------------
 b_color="deep-blue"; b4_color="$b_color"
@@ -61,27 +62,30 @@ while [[ $# -gt 0 ]]; do
         -b4) if is_valid "$2"; then b4_color="$2"; else b4_color=$(get_rand); fi ;;
         -c)  if is_valid "$2"; then f_color="$2";  else f_color=$(get_rand); fi ;;
         -c4) if is_valid "$2"; then f4_color="$2"; else f4_color=$(get_rand); fi ;;
-        -bl) if is_valid "$2"; then blogo_color="$2"; else blogo_color=$(get_rand); fi ;;
-        -fl) if is_valid "$2"; then flogo_color="$2"; else flogo_color=$(get_rand); fi ;;
+        -bl) if is_valid "$2"; then bl_color="$2"; else bl_color=$(get_rand); fi ;;
+        -fl) if is_valid "$2"; then fl_color="$2"; else fl_color=$(get_rand); fi ;;
         -wl) with_logo=0; offset=1 ;;
         -m)  if [ " $2 " != *" 2 "* ]; then word="$word$2"; hostn_max=4; fi ;;
         -x)  full_space=0; offset=1 ;;
         -h)  show_help; exit 0 ;;
-        *)   "$0" -h; exit 1 ;;
+        *)   echo "Option invalide: $1" >&2; "$0" -h; exit 1 ;;
     esac
+    (( $# < offset )) && { "$0" -h; exit 1; }
     shift $offset
 done
 
-while [[ "$b_color" == "$f_color" ]]; do f_color=$(get_rand); done
-while [[ "$b4_color" == "$f4_color" ]]; do f4_color=$(get_rand); done
-while [[ "$bl_color" == "$fl_color" ]]; do fl_color=$(get_rand); done
+for _ in {1..10}; do [[ "$b_color" != "$f_color" ]] && break; f_color=$(get_rand); done
+for _ in {1..10}; do [[ "$b4_color" != "$f4_color" ]] && break; f4_color=$(get_rand); done
+for _ in {1..10}; do [[ "$bl_color" != "$fl_color" ]] && break; fl_color=$(get_rand); done
 bl_val="${colors[$bl_color]}";  fl_val="${colors[$fl_color]}"
 bg_val="${colors[$b_color]}";   fg_val="${colors[$f_color]}"
 bg4_val="${colors[$b4_color]}"; fg4_val="${colors[$f4_color]}"
 
-mapfile -t hostn < <(grep -m 1 -B $hostn_max -E "^$word" "$0" | head -n $hostn_max)
+mapfile -t hostn < <(grep -m 1 -B $hostn_max -F "$word" "$0" | head -n $hostn_max)
 [ "$with_logo" == "1" ] && { mapfile -t logo < <(grep -B 3 -E "^oracle *" "$0" | head -n 3); }
-min=${#logo[0]}; max=${#hostn[0]}; nb_char="${#logo[0]}"
+nb_char="${#logo[0]}"
+: "${nb_char:=0}"
+max=${#hostn[0]}
 
 # ajout de lOS
 width=${#hostn[0]}; str="???"
@@ -89,7 +93,7 @@ width=${#hostn[0]}; str="???"
 if [ -f /etc/alpine-release ]; then
     str="Alpine v$(cat /etc/alpine-release)"
 elif [ -f /etc/os-release ]; then
-    . /etc/os-release
+    source /etc/os-release
     [[ -z "$ID" || -z "$VERSION" ]] && str="$PRETTY_NAME" || str="${ID^} $VERSION"
 fi
 hostn+=( "$(printf "%-${width}.${width}s" "$str")" )
